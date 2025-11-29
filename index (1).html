@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日反思 - Daily Reflection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .streak-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .three-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-input span {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 18px;
+            min-width: 25px;
+        }
+
+        .item-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .item-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .identity-section {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #667eea30;
+        }
+
+        .identity-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .identity-input span {
+            font-size: 24px;
+        }
+
+        .identity-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .clear-btn {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .clear-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .history-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .history-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(250, 112, 154, 0.4);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .hint {
+            color: #999;
+            font-size: 13px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .history-item {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .history-item-date {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .history-item-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .history-item-content strong {
+            color: #333;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="streak-badge" id="streakBadge">🔥 連續 0 天</div>
+            <h1>✨ 每日反思</h1>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">今日做得最好的三件事</div>
+            <div class="three-items">
+                <div class="item-input">
+                    <span>1.</span>
+                    <input type="text" id="best1" placeholder="輸入第一件事...">
+                </div>
+                <div class="item-input">
+                    <span>2.</span>
+                    <input type="text" id="best2" placeholder="輸入第二件事...">
+                </div>
+                <div class="item-input">
+                    <span>3.</span>
+                    <input type="text" id="best3" placeholder="輸入第三件事...">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">今日感恩的三件事</div>
+            <div class="three-items">
+                <div class="item-input">
+                    <span>1.</span>
+                    <input type="text" id="grateful1" placeholder="我感恩...">
+                </div>
+                <div class="item-input">
+                    <span>2.</span>
+                    <input type="text" id="grateful2" placeholder="我感恩...">
+                </div>
+                <div class="item-input">
+                    <span>3.</span>
+                    <input type="text" id="grateful3" placeholder="我感恩...">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">今天發生的事件，讓我有什麼感覺</div>
+            <textarea id="feelings" placeholder="描述今天發生的事件以及你的感受..."></textarea>
+        </div>
+
+        <div class="section">
+            <div class="section-title">這件事觸發的是哪個舊敘事？</div>
+            <textarea id="oldNarrative" placeholder="反思這個事件觸發了哪些過往的思維模式或信念..."></textarea>
+            <div class="hint">提示：思考這是否與過去的經歷、恐懼或限制性信念有關</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">我可以重新下載什麼信念跟感覺？</div>
+            <textarea id="newBelief" placeholder="寫下你想要建立的新信念和感受..."></textarea>
+            <div class="hint">提示：用正面、肯定的語句重構你的認知</div>
+        </div>
+
+        <div class="section identity-section">
+            <div class="section-title">我是誰</div>
+            <div class="identity-input">
+                <span>✔</span>
+                <input type="text" id="identity" placeholder="例如：我是一個願意讓自己活得更好的人">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="save-btn" onclick="saveReflection()">💾 保存今日反思</button>
+            <button class="history-btn" onclick="showHistory()">📚 查看歷史記錄</button>
+            <button class="export-btn" onclick="exportData()">📥 導出所有記錄</button>
+            <button class="clear-btn" onclick="clearAll()">🔄 清空內容</button>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📚 歷史記錄</h2>
+                <span class="close" onclick="closeHistory()">&times;</span>
+            </div>
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalDays">0</div>
+                    <div class="stat-label">總天數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="currentStreak">0</div>
+                    <div class="stat-label">當前連續</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="longestStreak">0</div>
+                    <div class="stat-label">最長連續</div>
+                </div>
+            </div>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">✓ 保存成功！</div>
+
+    <script>
+        function updateDate() {
+            const today = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDate').textContent = 
+                today.toLocaleDateString('zh-TW', options);
+        }
+
+        function calculateStreak() {
+            const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            if (history.length === 0) return 0;
+
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < history.length; i++) {
+                const recordDate = new Date(history[i].date);
+                recordDate.setHours(0, 0, 0, 0);
+                
+                const expectedDate = new Date(today);
+                expectedDate.setDate(expectedDate.getDate() - i);
+                
+                if (recordDate.getTime() === expectedDate.getTime()) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        function calculateLongestStreak() {
+            const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            if (history.length === 0) return 0;
+
+            let longest = 1;
+            let current = 1;
+
+            for (let i = 1; i < history.length; i++) {
+                const prevDate = new Date(history[i-1].date);
+                const currDate = new Date(history[i].date);
+                
+                const diffDays = Math.floor((prevDate - currDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    current++;
+                    longest = Math.max(longest, current);
+                } else {
+                    current = 1;
+                }
+            }
+
+            return longest;
+        }
+
+        function updateStreakBadge() {
+            const streak = calculateStreak();
+            document.getElementById('streakBadge').textContent = `🔥 連續 ${streak} 天`;
+        }
+
+        function saveReflection() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            const reflection = {
+                date: today,
+                timestamp: new Date().toISOString(),
+                best: [
+                    document.getElementById('best1').value,
+                    document.getElementById('best2').value,
+                    document.getElementById('best3').value
+                ],
+                grateful: [
+                    document.getElementById('grateful1').value,
+                    document.getElementById('grateful2').value,
+                    document.getElementById('grateful3').value
+                ],
+                feelings: document.getElementById('feelings').value,
+                oldNarrative: document.getElementById('oldNarrative').value,
+                newBelief: document.getElementById('newBelief').value,
+                identity: document.getElementById('identity').value
+            };
+
+            let history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            const existingIndex = history.findIndex(item => item.date === today);
+            
+            if (existingIndex >= 0) {
+                history[existingIndex] = reflection;
+            } else {
+                history.unshift(reflection);
+            }
+
+            localStorage.setItem('reflectionHistory', JSON.stringify(history));
+            
+            updateStreakBadge();
+            showToast('✓ 保存成功！');
+        }
+
+        function clearAll() {
+            if (confirm('確定要清空所有內容嗎？')) {
+                document.getElementById('best1').value = '';
+                document.getElementById('best2').value = '';
+                document.getElementById('best3').value = '';
+                document.getElementById('grateful1').value = '';
+                document.getElementById('grateful2').value = '';
+                document.getElementById('grateful3').value = '';
+                document.getElementById('feelings').value = '';
+                document.getElementById('oldNarrative').value = '';
+                document.getElementById('newBelief').value = '';
+                document.getElementById('identity').value = '';
+                showToast('✓ 已清空內容');
+            }
+        }
+
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            const modal = document.getElementById('historyModal');
+            const content = document.getElementById('historyContent');
+            
+            document.getElementById('totalDays').textContent = history.length;
+            document.getElementById('currentStreak').textContent = calculateStreak();
+            document.getElementById('longestStreak').textContent = calculateLongestStreak();
+
+            if (history.length === 0) {
+                content.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">還沒有任何記錄，開始你的第一天反思吧！</p>';
+            } else {
+                content.innerHTML = history.map(item => {
+                    const date = new Date(item.date);
+                    const dateStr = date.toLocaleDateString('zh-TW', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        weekday: 'long'
+                    });
+
+                    return `
+                        <div class="history-item">
+                            <div class="history-item-date">${dateStr}</div>
+                            <div class="history-item-content">
+                                ${item.best.filter(b => b).length > 0 ? `<strong>今日做得最好：</strong>${item.best.filter(b => b).map((b, i) => `${i+1}. ${b}`).join(' | ')}` : ''}
+                                ${item.grateful.filter(g => g).length > 0 ? `<strong>今日感恩：</strong>${item.grateful.filter(g => g).map((g, i) => `${i+1}. ${g}`).join(' | ')}` : ''}
+                                ${item.feelings ? `<strong>感受：</strong>${item.feelings}` : ''}
+                                ${item.oldNarrative ? `<strong>舊敘事：</strong>${item.oldNarrative}` : ''}
+                                ${item.newBelief ? `<strong>新信念：</strong>${item.newBelief}` : ''}
+                                ${item.identity ? `<strong>我是誰：</strong>✔ ${item.identity}` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        function exportData() {
+            const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            
+            if (history.length === 0) {
+                showToast('⚠ 沒有可導出的記錄');
+                return;
+            }
+
+            let text = '每日反思記錄導出\n';
+            text += '==========================================\n\n';
+
+            history.forEach(item => {
+                const date = new Date(item.date);
+                text += `日期：${date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}\n`;
+                text += `時間：${item.timestamp ? new Date(item.timestamp).toLocaleString('zh-TW') : '未記錄'}\n\n`;
+                
+                text += '今日做得最好的三件事：\n';
+                item.best.forEach((b, i) => {
+                    if (b) text += `${i+1}. ${b}\n`;
+                });
+                text += '\n';
+
+                text += '今日感恩的三件事：\n';
+                item.grateful.forEach((g, i) => {
+                    if (g) text += `${i+1}. ${g}\n`;
+                });
+                text += '\n';
+
+                if (item.feelings) {
+                    text += `今天的事件與感受：\n${item.feelings}\n\n`;
+                }
+
+                if (item.oldNarrative) {
+                    text += `觸發的舊敘事：\n${item.oldNarrative}\n\n`;
+                }
+
+                if (item.newBelief) {
+                    text += `新的信念與感覺：\n${item.newBelief}\n\n`;
+                }
+
+                if (item.identity) {
+                    text += `我是誰：\n✔ ${item.identity}\n\n`;
+                }
+
+                text += '==========================================\n\n';
+            });
+
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `每日反思記錄_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('✓ 導出成功！');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        function loadTodayReflection() {
+            const today = new Date().toISOString().split('T')[0];
+            const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+            const todayReflection = history.find(item => item.date === today);
+
+            if (todayReflection) {
+                document.getElementById('best1').value = todayReflection.best[0] || '';
+                document.getElementById('best2').value = todayReflection.best[1] || '';
+                document.getElementById('best3').value = todayReflection.best[2] || '';
+                document.getElementById('grateful1').value = todayReflection.grateful[0] || '';
+                document.getElementById('grateful2').value = todayReflection.grateful[1] || '';
+                document.getElementById('grateful3').value = todayReflection.grateful[2] || '';
+                document.getElementById('feelings').value = todayReflection.feelings || '';
+                document.getElementById('oldNarrative').value = todayReflection.oldNarrative || '';
+                document.getElementById('newBelief').value = todayReflection.newBelief || '';
+                document.getElementById('identity').value = todayReflection.identity || '';
+            }
+        }
+
+        setInterval(() => {
+            const hasContent = 
+                document.getElementById('best1').value ||
+                document.getElementById('feelings').value ||
+                document.getElementById('identity').value;
+            
+            if (hasContent) {
+                saveReflection();
+            }
+        }, 30000);
+
+        function checkDailyReminder() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastCheck = localStorage.getItem('lastReminderCheck');
+            
+            if (lastCheck !== today) {
+                localStorage.setItem('lastReminderCheck', today);
+                
+                const history = JSON.parse(localStorage.getItem('reflectionHistory') || '[]');
+                const todayRecord = history.find(item => item.date === today);
+                
+                if (!todayRecord) {
+                    setTimeout(() => {
+                        if (confirm('📝 今天還沒有寫反思哦！現在就開始吧？')) {
+                            document.getElementById('best1').focus();
+                        }
+                    }, 2000);
+                }
+            }
+        }
+
+        window.onload = function() {
+            updateDate();
+            loadTodayReflection();
+            updateStreakBadge();
+            checkDailyReminder();
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveReflection();
+            }
+            if (e.key === 'Escape') {
+                closeHistory();
+            }
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('historyModal');
+            if (event.target == modal) {
+                closeHistory();
+            }
+        }
+    </script>
+</body>
+</html>
